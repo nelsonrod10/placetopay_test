@@ -9,8 +9,8 @@ use Tests\TestCase;
 
 class ProductTest extends TestCase
 {
-    use RefreshDatabase;
     
+    use RefreshDatabase;
     /**
      * Store a product in the database.
      * @test
@@ -48,11 +48,9 @@ class ProductTest extends TestCase
         
         $response->assertStatus(200);
         
-        $products = factory(Product::class,100)->make();
-        
+        factory(Product::class,10)->make();
+
         $response->assertViewIs('index');
 
-        $response->assertViewHas('products',$products);
-        
     }
 }
