@@ -34,4 +34,25 @@ class ProductTest extends TestCase
         
         $response->assertRedirect('products/'.$product->id);
     }
+
+    /**
+     * View all products in the store.
+     * @test
+     * @return void
+     */
+    public function listAndViewAllProducts()
+    {
+        $this->withoutExceptionHandling();
+
+        $response = $this->get('products');
+        
+        $response->assertStatus(200);
+        
+        $products = factory(Product::class,100)->make();
+        
+        $response->assertViewIs('index');
+
+        $response->assertViewHas('products',$products);
+        
+    }
 }
