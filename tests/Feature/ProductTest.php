@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -18,14 +19,19 @@ class ProductTest extends TestCase
     public function canCreateSingleProduct()
     {
         $this->withoutExceptionHandling();
-
-        $response = $this->post('products',[
+        $data = [
             'name'        => 'Product test',
             'price'       => '850000',
             'currency'    => 'COP',
             'description' => 'This is the best product'
-        ]);
-dd($response);
-        $response->assertStatus(200);
+        ];
+
+        $response = $this->post('products',$data);
+        
+        $product = Product::where('name',$data['name'])->first();
+
+        $this->assertDatabaseHas('products',['name' => $product->name]);    
+        
+        $response->assertRedirect('products/'.$product->id);
     }
 }
