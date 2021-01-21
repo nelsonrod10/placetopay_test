@@ -12,7 +12,7 @@ class ProductTest extends TestCase
     use RefreshDatabase;
     
     /**
-     * A basic feature test example.
+     * Store a product in the database.
      * @test
      * @return void
      */
