@@ -8,15 +8,24 @@ use Tests\TestCase;
 
 class ProductTest extends TestCase
 {
+    use RefreshDatabase;
+    
     /**
      * A basic feature test example.
-     *
+     * @test
      * @return void
      */
-    public function testExample()
+    public function canCreateSingleProduct()
     {
-        $response = $this->get('/');
+        $this->withoutExceptionHandling();
 
+        $response = $this->post('products',[
+            'name'        => 'Product test',
+            'price'       => '850000',
+            'currency'    => 'COP',
+            'description' => 'This is the best product'
+        ]);
+dd($response);
         $response->assertStatus(200);
     }
 }
