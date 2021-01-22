@@ -57,7 +57,7 @@ class OrderProductTest extends TestCase
         $response = $this->post('orders',$data);
 
         $newOrder = $product->getOrder($product->id);
-
+        
         $placeToPay = $newOrder->placeToPay($newOrder->id);
 
         $this->assertDatabaseHas('orders',['number'=>$newOrder->number]);
