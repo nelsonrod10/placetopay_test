@@ -10,8 +10,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class OrderProductTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
-     * A basic feature test example.
+     * Select a product for purchase.
      * @test
      * @return void
      */
@@ -30,5 +31,32 @@ class OrderProductTest extends TestCase
         $response->assertViewIs('orders.create');
 
         $response->assertViewHas('product',$product);
+    }
+
+    /**
+     * Store an order product with the buyer data.
+     * @test
+     * @return void
+     */
+    public function a_order_can_be_stored()
+    {
+        $this->withoutExceptionHandling();
+
+        factory(Product::class,1)->create();
+
+        $product = Product::first();
+
+        $data = [
+            'product' =>  $product->id,
+            'name'    => 'Nelson Rodriguez',
+            'email'   => 'bejin3@hotmail.com',
+            'phone'   => '3167585671'  
+        ];
+
+        $response = $this->post('orders',$data);
+
+        $newOrder = Order::where('product_id',$product->id)->first();
+
+        $this->assertEquals($product->id,$newOrder->product_id);
     }
 }
