@@ -37,8 +37,14 @@ class OrdersController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-
-        Order::create($data);
+        $orderNumber = base64_encode(sha1('Order_'.date('c')));
+        Order::create([
+            'product_id'      => $data['product_id'],
+            'number'          => $orderNumber,
+            'customer_name'   => $data['customer_name'], 
+            'customer_email'  => $data['customer_email'], 
+            'customer_mobile' => $data['customer_mobile'],
+        ]);
     }
 
     /**

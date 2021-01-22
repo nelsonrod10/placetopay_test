@@ -15,12 +15,12 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_id');
-            $table->string('number')->unique();
-            $table->string('customer_name',80);
-            $table->string('customer_email',120);
-            $table->string('customer_mobile',40);
-            $table->enum('status',['CREATED','PAYED','REJECTED']);
+            $table->unsignedBigInteger('product_id')->required();
+            $table->string('number')->unique()->required();
+            $table->string('customer_name',80)->required();
+            $table->string('customer_email',120)->required();
+            $table->string('customer_mobile',40)->required();
+            $table->enum('status',['CREATED','PAYED','REJECTED'])->default('CREATED')->required();
             $table->timestamps();
             $table->foreign('product_id')->references('id')->on('products');
         });
