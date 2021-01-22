@@ -40,7 +40,7 @@ class ProductTest extends TestCase
      * @test
      * @return void
      */
-    public function listAndViewAllProducts()
+    public function list_AndViewAllProducts()
     {
         $this->withoutExceptionHandling();
 
@@ -55,6 +55,29 @@ class ProductTest extends TestCase
         $response->assertViewIs('index');
 
         $response->assertViewHas('products',$products);
+
+    }
+
+    /**
+     * View all products in the store.
+     * @test
+     * @return void
+     */
+    public function can_show_a_product()
+    {
+        $this->withoutExceptionHandling();
+
+        factory(Product::class)->make();
+
+        $product = Product::first();
+
+        $response = $this->get('products/'.$product->id);
+        
+        $response->assertStatus(200);
+
+        $response->assertViewIs('products.show');
+
+        $response->assertViewHas('product',$product);
 
     }
 }
