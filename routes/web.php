@@ -19,4 +19,5 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::resource('products', 'ProductsController');
+Route::get('create-order/{product}', 'OrdersController@create');
 
