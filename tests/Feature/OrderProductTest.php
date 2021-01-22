@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Order;
 use App\Product;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -47,10 +48,10 @@ class OrderProductTest extends TestCase
         $product = Product::first();
 
         $data = [
-            'product' =>  $product->id,
-            'name'    => 'Nelson Rodriguez',
-            'email'   => 'bejin3@hotmail.com',
-            'phone'   => '3167585671'  
+            'product_id'          => $product->id,
+            'customer_name'    => 'Nelson Rodriguez',
+            'customer_email'   => 'bejin3@hotmail.com',
+            'customer_mobile'  => '3167585671'  
         ];
 
         $response = $this->post('orders',$data);
@@ -58,5 +59,6 @@ class OrderProductTest extends TestCase
         $newOrder = Order::where('product_id',$product->id)->first();
 
         $this->assertEquals($product->id,$newOrder->product_id);
+
     }
 }

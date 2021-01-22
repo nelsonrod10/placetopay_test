@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Order;
 use App\Product;
 use Illuminate\Http\Request;
 
@@ -35,7 +36,9 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->all();
+
+        Order::create($data);
     }
 
     /**
