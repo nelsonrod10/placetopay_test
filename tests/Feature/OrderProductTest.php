@@ -58,7 +58,10 @@ class OrderProductTest extends TestCase
 
         $newOrder = Order::where('product_id',$product->id)->first();
 
+        $this->assertDatabaseHas('orders',['number'=>$newOrder->number]);
+
         $this->assertEquals($product->id,$newOrder->product_id);
 
+        $response->assertRedirect($newOrder->process_url);
     }
 }
