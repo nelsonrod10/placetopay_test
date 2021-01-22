@@ -11,12 +11,13 @@ class ProductTest extends TestCase
 {
     
     use RefreshDatabase;
+
     /**
      * Store a product in the database.
      * @test
      * @return void
      */
-    public function canCreateSingleProduct()
+    public function can_create_single_product()
     {
         $this->withoutExceptionHandling();
         $data = [
@@ -40,7 +41,7 @@ class ProductTest extends TestCase
      * @test
      * @return void
      */
-    public function list_AndViewAllProducts()
+    public function list_and_view_all_products()
     {
         $this->withoutExceptionHandling();
 
@@ -59,7 +60,7 @@ class ProductTest extends TestCase
     }
 
     /**
-     * View all products in the store.
+     * View a specific product in the store.
      * @test
      * @return void
      */
