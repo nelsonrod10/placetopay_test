@@ -40,7 +40,7 @@ class OrdersController extends Controller
     {
         $data = $request->all();
 
-        $orderNumber = str_shuffle(Str::random(5).date('v').mt_rand (100,1000));
+        $orderNumber = str_shuffle(Str::random(5).date('s').mt_rand (100,1000));
         
         $product = Product::find($data['product_id']);
 
@@ -88,7 +88,7 @@ class OrdersController extends Controller
             ]);
 
             return redirect()->away($newOrder->process_url);
-            
+
         } else {
             return redirect()->back()->with(['errorProcess'=>$response->status()->message()]);
         }
