@@ -68,7 +68,7 @@ class ProductTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        factory(Product::class)->make();
+        factory(Product::class,1)->create();
 
         $product = Product::first();
 
