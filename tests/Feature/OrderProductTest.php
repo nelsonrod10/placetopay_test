@@ -56,12 +56,14 @@ class OrderProductTest extends TestCase
 
         $response = $this->post('orders',$data);
 
-        $newOrder = Order::where('product_id',$product->id)->first();
+        $newOrder = $product->getOrder($product->id);
+
+        $placeToPay = $newOrder->placeToPay($newOrder->id);
 
         $this->assertDatabaseHas('orders',['number'=>$newOrder->number]);
 
         $this->assertEquals($product->id,$newOrder->product_id);
 
-        $response->assertRedirect($newOrder->process_url);
+        $response->assertRedirect($placeToPay->process_url);
     }
 }

@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Order extends Model
+class PaymentGateway extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -12,6 +12,9 @@ class Order extends Model
      * @var array
      */
     protected $fillable = [
-        'product_id','number','customer_name', 'customer_email', 'customer_mobile', 'status',
+        'order_id',
+        'enterprise',
+        'payment_data',
     ];
+
 }

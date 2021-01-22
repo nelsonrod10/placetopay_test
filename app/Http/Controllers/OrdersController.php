@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Order;
 use App\Product;
-use Illuminate\Http\Request;
+use App\PaymentGateway;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Dnetix\Redirection\PlacetoPay;
+
 
 class OrdersController extends Controller
 {
@@ -83,11 +85,19 @@ class OrdersController extends Controller
                 'customer_name'   => $data['customer_name'], 
                 'customer_email'  => $data['customer_email'], 
                 'customer_mobile' => $data['customer_mobile'],
-                'process_url'     => $response->processUrl(),
-                'request_id'      => $response->requestId()    
             ]);
 
-            return redirect()->away($newOrder->process_url);
+            $payment = PaymentGateway::create([
+                'order_id'      => $newOrder->id,
+                'enterprise'    => 'PlaceToPay',
+                'payment_data'  => json_encode([
+                    'process_url' => $response->processUrl(),
+                    'request_id'  => $response->requestId(),
+                    'status'      => 'PENDING'      
+                ])
+            ]);
+
+            return redirect()->away($response->processUrl());
 
         } else {
             return redirect()->back()->with(['errorProcess'=>$response->status()->message()]);
