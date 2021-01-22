@@ -20,6 +20,8 @@ class CreateOrdersTable extends Migration
             $table->string('customer_name',80)->required();
             $table->string('customer_email',120)->required();
             $table->string('customer_mobile',40)->required();
+            $table->string('process_url')->nullable();
+            $table->string('request_id')->nullable();
             $table->enum('status',['CREATED','PAYED','REJECTED'])->default('CREATED')->required();
             $table->timestamps();
             $table->foreign('product_id')->references('id')->on('products');
