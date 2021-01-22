@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Order;
 use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class OrdersController extends Controller
 {
@@ -37,7 +38,7 @@ class OrdersController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-        $orderNumber = base64_encode(sha1('Order_'.date('c')));
+        $orderNumber = base64_encode(sha1('Order_'.date('c').'_'.Str::random(5)));
         Order::create([
             'product_id'      => $data['product_id'],
             'number'          => $orderNumber,
