@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Order;
 use Illuminate\Database\Eloquent\Model;
 
 class PaymentGateway extends Model
@@ -16,5 +17,10 @@ class PaymentGateway extends Model
         'enterprise',
         'payment_data',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class,'order_id');
+    }
 
 }

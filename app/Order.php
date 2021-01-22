@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\PaymentGateway;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
@@ -14,4 +15,9 @@ class Order extends Model
     protected $fillable = [
         'product_id','number','customer_name', 'customer_email', 'customer_mobile', 'status',
     ];
+
+    public function gateway()
+    {
+        return $this->hasOne(PaymentGateway::class);
+    }
 }

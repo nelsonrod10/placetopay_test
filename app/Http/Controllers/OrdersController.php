@@ -87,7 +87,7 @@ class OrdersController extends Controller
                 'customer_mobile' => $data['customer_mobile'],
             ]);
 
-            $payment = PaymentGateway::create([
+            PaymentGateway::create([
                 'order_id'      => $newOrder->id,
                 'enterprise'    => 'PlaceToPay',
                 'payment_data'  => json_encode([

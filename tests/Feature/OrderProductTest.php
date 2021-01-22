@@ -39,7 +39,7 @@ class OrderProductTest extends TestCase
      * @test
      * @return void
      */
-    public function a_order_can_be_stored()
+    public function a_order_can_be_stored_and_use_placetopay()
     {
         $this->withoutExceptionHandling();
 
@@ -58,12 +58,14 @@ class OrderProductTest extends TestCase
 
         $newOrder = $product->getOrder($product->id);
         
-        $placeToPay = $newOrder->placeToPay($newOrder->id);
+        $placeToPay = $newOrder->gateway()->first();
+
+        $dataGateway =  json_decode($placeToPay->payment_data,true);
 
         $this->assertDatabaseHas('orders',['number'=>$newOrder->number]);
 
         $this->assertEquals($product->id,$newOrder->product_id);
 
-        $response->assertRedirect($placeToPay->process_url);
+        $response->assertRedirect($dataGateway['process_url']);
     }
 }
