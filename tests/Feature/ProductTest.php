@@ -44,13 +44,17 @@ class ProductTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        factory(Product::class,10)->make();
+
         $response = $this->get('products');
         
         $response->assertStatus(200);
         
-        factory(Product::class,10)->make();
+        $products = Product::all();
 
         $response->assertViewIs('index');
+
+        $response->assertViewHas('products',$products);
 
     }
 }
