@@ -39,7 +39,10 @@ class StoreOrderRequest extends FormRequest
     public function attributes()
     {
         return [
-            'product_id' => __('translations.product'),
+            'product_id'      => __('translations.product'),
+            'customer_name'   => __('translations.name'),
+            'customer_email'  => __('translations.email'),
+            'customer_mobile' => __('translations.mobile'),
         ];
     }
 

@@ -91,9 +91,9 @@ class OrderProductTest extends TestCase
 
         $response->assertSessionHasErrors([
             'product_id' => 'The selected product is invalid.',
-            'customer_name',
-            'customer_email',
-            'customer_mobile',
+            'customer_name' => 'The name field is required.',
+            'customer_email'=> 'The email field is required.',
+            'customer_mobile' => 'The mobile field is required.',
         ]);
 
     }
