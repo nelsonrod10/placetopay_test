@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Order;
+use App\PaymentGateway;
 use App\Product;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -95,6 +96,46 @@ class OrderProductTest extends TestCase
             'customer_email'=> 'El campo email es obligatorio.',
             'customer_mobile' => 'El campo número celular es obligatorio.',
         ]);
+
+    }
+
+    /**
+     * Show order summary to customer, before proceed to gateway pay.
+     * @test
+     * @return void
+     */
+    public function show_a_order_summary_to_customer()
+    {
+        $processUrl = "https://www.testapp.com";
+        $requestId  = 8090100;
+
+        factory(Product::class,1)->create();
+        $product = Product::first();
+
+        factory(Order::class)->create([
+            'product_id' => $product->id,
+        ])->each(function($order) use($processUrl,$requestId) {
+            factory(PaymentGateway::class)->create([
+                'order_id' => $order->id,
+                'enterprise' => 'Place to pay',
+                'payment_data' => json_encode([
+                    'process_url' => $processUrl,
+                    'request_id'  => $requestId,
+                    'status'      => 'PENDING'      
+                ]),
+            ]);
+        });
+        
+        $newOrder = $product->getOrder();
+
+        $response = $this->get('orders/'.$newOrder->id);
+
+        $response->assertStatus(200);
+
+        /*$response->assertViewIs('orders.show');
+        $response->assertViewHas([
+            'order'=> $newOrder,
+        ]);*/
 
     }
 
