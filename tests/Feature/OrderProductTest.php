@@ -144,4 +144,14 @@ class OrderProductTest extends TestCase
 
     }
 
+    /**
+     * Show orders index for admin user.
+     * @test
+     * @return void
+     */
+    public function show_a_orders_index_to_admin()
+    {
+        //
+    }
+
 }
