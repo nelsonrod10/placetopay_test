@@ -22,5 +22,5 @@ Route::resource('products', 'ProductsController');
 Route::get('create-order/{product}', 'OrdersController@create');
 Route::resource('orders', 'OrdersController');
 Route::get('validate-payment/{reference}', 'PlacetoPlayController@validateStatus');
-Route::get('payment-result/{reference}', 'PlacetoPlayController@show')->name('payment-result');
+Route::post('payment-result', 'PlacetoPlayController@show')->name('payment-result');
 

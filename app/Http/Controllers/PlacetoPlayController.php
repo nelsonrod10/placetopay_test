@@ -16,6 +16,7 @@ class PlacetoPlayController extends Controller
     public function validateStatus($reference)
     {
         $order = Order::where('number',$reference)->first();
+        $arrStatus = null;
 
         $gateway = $order->gateway()->first();
         $dataGateway =  json_decode($gateway->payment_data,true);
@@ -54,7 +55,12 @@ class PlacetoPlayController extends Controller
             
         }
 
-        return redirect()->route('payment-result',['reference' => $reference]);
+        return redirect()->route('payment-result',
+            new Request([
+                'reference' => $reference,
+                'status'    => $arrStatus
+            ])
+        );
     }
 
     /**
@@ -84,10 +90,13 @@ class PlacetoPlayController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($reference)
+    public function show(Request $data)
     {
+        $reference = $data['reference'];
+        $status = $data['status']['status'];
+        
         $order = Order::where('number',$reference)->first();
-        return view('payments.show',compact('order'));        
+        return view('payments.show',compact('order','status'));        
     }
 
     /**

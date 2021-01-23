@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Order;
 use App\Product;
 use Tests\TestCase;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -40,15 +41,27 @@ class PaymentProcessTest extends TestCase
         
         $redirectResponse = $this->get('validate-payment/'.$newOrder->number);
 
-        $redirectResponse->assertRedirect(route('payment-result',['reference' => $newOrder->number]));
+        $status = [
+            'status'  => 'APPROVED',
+            'reason'  => 'XS',
+            'message' => 'The message of the status',
+            'date'    => '23-01-2021',
+        ];
+            
+        $redirectResponse->assertRedirect(route('payment-result', 
+            new Request([
+                'reference' => $newOrder->number,
+                'status'    => $status
+            ])
+        ));
     }
     
     /**
-     * A buyer can see the payment result.
+     * A buyer can see the approved payment result.
      * @test
      * @return void
      */
-    public function a_buyer_can_see_payment_result()
+    public function a_buyer_can_see_payment_approved_result()
     {
         $this->withoutExceptionHandling();
 
@@ -60,13 +73,28 @@ class PaymentProcessTest extends TestCase
         ]);
         
         $newOrder = $product->getOrder();
-        
-        $redirectResponse = $this->get('payment-result/'.$newOrder->number);
+
+        $status = [
+            'status'  => 'APPROVED',
+            'reason'  => 'XX',
+            'message' => 'The message of the status',
+            'date'    => '23-01-2021',
+        ];
+
+        $redirectResponse = $this->post('payment-result',
+            [
+                'reference' => $newOrder->number,
+                'status'    => $status
+            ]
+        );
 
         $redirectResponse->assertStatus(200);
 
         $redirectResponse->assertViewIs('payments.show');
-        $redirectResponse->assertViewHas('order',$newOrder);
+        $redirectResponse->assertViewHas([
+            'order'=> $newOrder,
+            'status' => $status['status']
+        ]);
     }
 
     
