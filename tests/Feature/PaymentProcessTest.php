@@ -97,5 +97,46 @@ class PaymentProcessTest extends TestCase
         ]);
     }
 
+    /**
+     * A buyer can see the pending payment result.
+     * @test
+     * @return void
+     */
+    public function a_buyer_can_see_payment_pending_result()
+    {
+        $this->withoutExceptionHandling();
+
+        factory(Product::class,1)->create();
+        $product = Product::first();
+
+        factory(Order::class)->create([
+            'product_id'          => $product->id,
+        ]);
+        
+        $newOrder = $product->getOrder();
+
+        $status = [
+            'status'  => 'PENDING',
+            'reason'  => 'XX',
+            'message' => 'The message of the status',
+            'date'    => '23-01-2021',
+        ];
+
+        $redirectResponse = $this->post('payment-result',
+            [
+                'reference' => $newOrder->number,
+                'status'    => $status
+            ]
+        );
+
+        $redirectResponse->assertStatus(200);
+
+        $redirectResponse->assertViewIs('payments.show');
+        $redirectResponse->assertViewHas([
+            'order'=> $newOrder,
+            'status' => $status['status']
+        ]);
+    }
+
     
 }
