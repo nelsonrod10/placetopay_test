@@ -90,10 +90,10 @@ class OrderProductTest extends TestCase
         $response = $this->post('orders',$data);
 
         $response->assertSessionHasErrors([
-            'product_id' => 'The selected product is invalid.',
-            'customer_name' => 'The name field is required.',
-            'customer_email'=> 'The email field is required.',
-            'customer_mobile' => 'The mobile field is required.',
+            'product_id'    => 'El producto no existe.',
+            'customer_name' => 'El campo nombre es obligatorio.',
+            'customer_email'=> 'El campo email es obligatorio.',
+            'customer_mobile' => 'El campo número celular es obligatorio.',
         ]);
 
     }
