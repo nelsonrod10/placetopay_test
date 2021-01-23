@@ -23,9 +23,9 @@ class PlacetoPlayController extends Controller
         $dataGateway =  json_decode($gateway->payment_data,true);
 
         $placetopay = new PlacetoPay([
-            'login'     => '6dd490faf9cb87a9862245da41170ff2',
-            'tranKey'   => '024h1IlD',
-            'url'       => 'https://dev.placetopay.com/redirection/',
+            'login'     => env('LOGIN_P2P'),
+            'tranKey'   => env('TRANKEY_P2P'),
+            'url'       => env('BASE_URL_P2P'),
             'rest'      => [
                 'timeout' => 45,
                 'connect_timeout' => 30,
