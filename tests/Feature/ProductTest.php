@@ -37,6 +37,31 @@ class ProductTest extends TestCase
     }
 
     /**
+     * Validate data before to store new product.
+     * @test
+     * @return void
+     */
+    public function validate_data_before_store_a_product()
+    {
+        $this->withoutExceptionHandling();
+        $data = [
+            'name'        => null,
+            'price'       => null,
+            'currency'    => null,
+            'description' => null
+        ];
+
+        $response = $this->post('products',$data);
+        
+        $response->assertSessionHasErrors([
+            'name',        
+            'price',       
+            'currency',
+            'description', 
+        ]);
+    }
+
+    /**
      * View all products in the store.
      * @test
      * @return void
