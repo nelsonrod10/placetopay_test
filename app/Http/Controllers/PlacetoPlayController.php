@@ -48,16 +48,10 @@ class PlacetoPlayController extends Controller
                 ]);
             }
 
-            if ($response->status()->isRejected()) {
-                
-                $order->update([
-                    'status' => 'REJECTED'
-                ]);
-            }
-
         } else {
             
-            print_r($response->status()->message() . "\n");
+            return redirect()->back()->with(['errorMessage' => $response->status()->message()]);
+            
         }
 
         return redirect()->route('payment-result',['reference' => $reference]);
