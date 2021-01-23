@@ -68,4 +68,34 @@ class OrderProductTest extends TestCase
 
         $response->assertRedirect($dataGateway['process_url']);
     }
+
+    /**
+     * Validate the validation errors when store an order.
+     * @test
+     * @return void
+     */
+    public function a_stored_order_must_validate_data()
+    {
+        factory(Product::class,1)->create();
+
+        $product = Product::first();
+
+        $data = [
+            'product_id'       => $product->id,
+            'customer_name'    => 'Nelson Rodriguez',
+            'customer_email'   => 'bejin3@hotmail.com',
+            'customer_mobile'  => '3167585671'  
+        ];
+
+        $response = $this->post('orders',$data);
+
+        $response->assertSessionHasErrors([
+            'product_id',
+            'customer_name',
+            'customer_email',
+            'customer_mobile',
+        ]);
+
+    }
+
 }
