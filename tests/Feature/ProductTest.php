@@ -44,21 +44,19 @@ class ProductTest extends TestCase
     public function validate_data_before_store_a_product()
     {
         $this->withoutExceptionHandling();
-        $data = [
-            'name'        => null,
-            'price'       => null,
-            'currency'    => null,
-            'description' => null
-        ];
 
-        $response = $this->post('products',$data);
-        
-        $response->assertSessionHasErrors([
+        $response = $this->post('products',[
+            'name'        => 'The name on the product',
+            'price'       => '950000',
+            'currency'    => 'COP',
+            'description' => 'the short description'
+        ])->assertSessionHasNoErrors([
             'name',        
             'price',       
             'currency',
             'description', 
         ]);
+        
     }
 
     /**
