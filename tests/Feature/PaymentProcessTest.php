@@ -55,84 +55,36 @@ class PaymentProcessTest extends TestCase
             ])
         ));
     }
-    
-    /**
-     * A buyer can see the approved payment result.
-     * @test
-     * @return void
-     */
-    public function a_buyer_can_see_payment_approved_result()
-    {
-        $this->withoutExceptionHandling();
 
+    public function get_payment_result($status)
+    {
         factory(Product::class,1)->create();
         $product = Product::first();
 
         factory(Order::class)->create([
-            'product_id'          => $product->id,
+            'product_id' => $product->id,
         ]);
         
         $newOrder = $product->getOrder();
 
         $status = [
-            'status'  => 'APPROVED',
+            'status'  => $status,
             'reason'  => 'XX',
             'message' => 'The message of the status',
             'date'    => '23-01-2021',
         ];
 
-        $redirectResponse = $this->post('payment-result',
+        $response = $this->post('payment-result',
             [
                 'reference' => $newOrder->number,
                 'status'    => $status
             ]
         );
 
-        $redirectResponse->assertStatus(200);
+        $response->assertStatus(200);
 
-        $redirectResponse->assertViewIs('payments.show');
-        $redirectResponse->assertViewHas([
-            'order'=> $newOrder,
-            'status' => $status['status']
-        ]);
-    }
-
-    /**
-     * A buyer can see the pending payment result.
-     * @test
-     * @return void
-     */
-    public function a_buyer_can_see_payment_pending_result()
-    {
-        $this->withoutExceptionHandling();
-
-        factory(Product::class,1)->create();
-        $product = Product::first();
-
-        factory(Order::class)->create([
-            'product_id'          => $product->id,
-        ]);
-        
-        $newOrder = $product->getOrder();
-
-        $status = [
-            'status'  => 'PENDING',
-            'reason'  => 'XX',
-            'message' => 'The message of the status',
-            'date'    => '23-01-2021',
-        ];
-
-        $redirectResponse = $this->post('payment-result',
-            [
-                'reference' => $newOrder->number,
-                'status'    => $status
-            ]
-        );
-
-        $redirectResponse->assertStatus(200);
-
-        $redirectResponse->assertViewIs('payments.show');
-        $redirectResponse->assertViewHas([
+        $response->assertViewIs('payments.show');
+        $response->assertViewHas([
             'order'=> $newOrder,
             'status' => $status['status']
         ]);
@@ -147,36 +99,35 @@ class PaymentProcessTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        factory(Product::class,1)->create();
-        $product = Product::first();
+        $this->get_payment_result('REJECTED');
 
-        factory(Order::class)->create([
-            'product_id'          => $product->id,
-        ]);
+    }
+
+    /**
+     * A buyer can see the pending payment result.
+     * @test
+     * @return void
+     */
+    public function a_buyer_can_see_payment_pending_result()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->get_payment_result('PENDING');
+          
+    }
+
+    /**
+     * A buyer can see the pending payment result.
+     * @test
+     * @return void
+     */
+    public function a_buyer_can_see_payment_approved_result()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->get_payment_result('APPROVED');
+
         
-        $newOrder = $product->getOrder();
-
-        $status = [
-            'status'  => 'REJECTED',
-            'reason'  => 'XX',
-            'message' => 'The message of the status',
-            'date'    => '23-01-2021',
-        ];
-
-        $redirectResponse = $this->post('payment-result',
-            [
-                'reference' => $newOrder->number,
-                'status'    => $status
-            ]
-        );
-
-        $redirectResponse->assertStatus(200);
-
-        $redirectResponse->assertViewIs('payments.show');
-        $redirectResponse->assertViewHas([
-            'order'=> $newOrder,
-            'status' => $status['status']
-        ]);
     }
 
     
