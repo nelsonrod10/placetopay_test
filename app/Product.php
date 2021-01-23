@@ -21,9 +21,9 @@ class Product extends Model
         return $this->hasMany(Order::class);
     }
 
-    public function getOrder($id)
+    public function getOrder()
     {
-        return $this->orders->where('product_id',$id)->first();
+        return $this->orders->where('product_id',$this->id)->first();
     }
             
 }

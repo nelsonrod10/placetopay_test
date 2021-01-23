@@ -34,16 +34,14 @@ class PaymentProcessTest extends TestCase
 
         $response = $this->post('orders',$data);
 
-        $newOrder = $product->getOrder($product->id);
+        $response->assertStatus(302);
+
+        $newOrder = $product->getOrder();
         
-        $placeToPay = $newOrder->gateway()->first();
+        $redirectResponse = $this->get('validate-payment/'.$newOrder->number);
 
-        $dataGateway =  json_decode($placeToPay->payment_data,true);
-
-        $redirectResponse = $this->get('payment-result/'.$dataGateway['request_id']);
-
-        $redirectResponse->assertStatus(200);
-    }    
+        $redirectResponse->assertRedirect(route('payment-result',['reference' => $newOrder->number]));
+    }   
 
     
 }

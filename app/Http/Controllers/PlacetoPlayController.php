@@ -2,19 +2,65 @@
 
 namespace App\Http\Controllers;
 
+use App\Order;
 use Illuminate\Http\Request;
 use Dnetix\Redirection\PlacetoPay;
 
 class PlacetoPlayController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Validate the status of payment reference
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function validateStatus($reference)
     {
-        //
+        $order = Order::where('number',$reference)->first();
+
+        $gateway = $order->gateway()->first();
+        $dataGateway =  json_decode($gateway->payment_data,true);
+
+        $placetopay = new PlacetoPay([
+            'login'     => '6dd490faf9cb87a9862245da41170ff2',
+            'tranKey'   => '024h1IlD',
+            'url'       => 'https://dev.placetopay.com/redirection/',
+            'rest'      => [
+                'timeout' => 45,
+                'connect_timeout' => 30,
+            ]
+        ]);
+
+        $response = $placetopay->query($dataGateway['request_id']);
+
+        if ($response->isSuccessful()) {
+            $arrStatus = $response->status()->toArray();
+            
+            $dataGateway['status'] = $arrStatus['status'];
+
+            $gateway->update([
+                'payment_data'  => json_encode($dataGateway)
+            ]);
+            
+            if ($response->status()->isApproved()) {
+                
+                $order->update([
+                    'status' => 'PAYED'
+                ]);
+            }
+
+            if ($response->status()->isRejected()) {
+                
+                $order->update([
+                    'status' => 'REJECTED'
+                ]);
+            }
+
+        } else {
+            
+            print_r($response->status()->message() . "\n");
+        }
+
+        return redirect()->route('payment-result',['reference' => $reference]);
     }
 
     /**
@@ -46,29 +92,7 @@ class PlacetoPlayController extends Controller
      */
     public function show($reference)
     {
-        $placetopay = new PlacetoPay([
-            'login'     => '6dd490faf9cb87a9862245da41170ff2',
-            'tranKey'   => '024h1IlD',
-            'url'       => 'https://dev.placetopay.com/redirection/',
-            'rest'      => [
-                'timeout' => 45,
-                'connect_timeout' => 30,
-            ]
-        ]);
-
-        $response = $placetopay->query($reference);
-
-        if ($response->isSuccessful()) {
-            // In order to use the functions please refer to the Dnetix\Redirection\Message\RedirectInformation class
-            //$arrStatus = $response->status()->toArray();
-            //$arrStatus['status']
-            if ($response->status()->isApproved()) {
-                // The payment has been approved
-            }
-        } else {
-            // There was some error with the connection so check the message
-            print_r($response->status()->message() . "\n");
-        }
+        dd($reference);
         
     }
 

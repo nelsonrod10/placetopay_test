@@ -56,7 +56,7 @@ class OrderProductTest extends TestCase
 
         $response = $this->post('orders',$data);
 
-        $newOrder = $product->getOrder($product->id);
+        $newOrder = $product->getOrder();
         
         $placeToPay = $newOrder->gateway()->first();
 
