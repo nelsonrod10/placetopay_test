@@ -132,10 +132,15 @@ class OrderProductTest extends TestCase
 
         $response->assertStatus(200);
 
-        /*$response->assertViewIs('orders.show');
+        $response->assertViewIs('orders.show');
         $response->assertViewHas([
             'order'=> $newOrder,
-        ]);*/
+            'payment' => [
+                'process_url' => $processUrl,
+                'request_id'  => $requestId,
+                'status'      => 'PENDING'      
+            ]
+        ]);
 
     }
 

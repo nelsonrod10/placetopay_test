@@ -111,9 +111,13 @@ class OrdersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Order $order)
     {
-        //
+        $gateway = $order->gateway()->first();
+        $payment = json_decode($gateway->payment_data,true);
+
+        return view('orders.show',compact('order','payment'));
+        
     }
 
     /**
