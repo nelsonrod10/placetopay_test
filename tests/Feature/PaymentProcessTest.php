@@ -130,5 +130,29 @@ class PaymentProcessTest extends TestCase
         
     }
 
+    /**
+     * Validate data before to show a payment result.
+     * @test
+     * @return void
+     */
+    public function payment_result_must_validate_data()
+    {
+        $this->withoutExceptionHandling();
+
+        $response = $this->post('payment-result',
+            [
+                'reference' => "dsdfsdfddd",
+                'status'    => "FAKER"
+            ]
+        );
+
+        $response->assertSessionHasErrors([
+            'reference',
+            'status',
+        ]);
+
+        
+    }
+
     
 }
