@@ -90,7 +90,7 @@ class OrderProductTest extends TestCase
         $response = $this->post('orders',$data);
 
         $response->assertSessionHasErrors([
-            'product_id',
+            'product_id' => 'The selected product is invalid.',
             'customer_name',
             'customer_email',
             'customer_mobile',
