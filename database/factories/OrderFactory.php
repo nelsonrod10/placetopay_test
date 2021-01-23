@@ -13,6 +13,6 @@ $factory->define(Order::class, function (Faker $faker) {
         'customer_name'  => $faker->name(),
         'customer_email' => $faker->freeEmail,
         'customer_mobile'=> $faker->phoneNumber,
-        'status'         => Arr::radom(['CREATED','PAYED','REJECTED']),
+        'status'         => Arr::random(['CREATED','PAYED','REJECTED']),
     ];
 });
