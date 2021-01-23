@@ -64,6 +64,9 @@ class PaymentProcessTest extends TestCase
         $redirectResponse = $this->get('payment-result/'.$newOrder->number);
 
         $redirectResponse->assertStatus(200);
+
+        $redirectResponse->assertViewIs('payments.show');
+        $redirectResponse->assertViewHas('order',$newOrder);
     }
 
     

@@ -92,8 +92,8 @@ class PlacetoPlayController extends Controller
      */
     public function show($reference)
     {
-        dd($reference);
-        
+        $order = Order::where('number',$reference)->first();
+        return view('payments.show',compact('order'));        
     }
 
     /**
