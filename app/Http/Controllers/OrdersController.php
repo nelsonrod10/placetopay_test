@@ -8,7 +8,7 @@ use App\PaymentGateway;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Dnetix\Redirection\PlacetoPay;
-
+use App\Http\Requests\Orders\StoreOrderRequest;
 
 class OrdersController extends Controller
 {
@@ -38,7 +38,7 @@ class OrdersController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreOrderRequest $request)
     {
         $data = $request->all();
 

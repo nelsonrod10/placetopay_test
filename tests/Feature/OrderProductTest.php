@@ -81,10 +81,10 @@ class OrderProductTest extends TestCase
         $product = Product::first();
 
         $data = [
-            'product_id'       => $product->id,
-            'customer_name'    => 'Nelson Rodriguez',
-            'customer_email'   => 'bejin3@hotmail.com',
-            'customer_mobile'  => '3167585671'  
+            'product_id'       => 80,
+            'customer_name'    => null,
+            'customer_email'   => null,
+            'customer_mobile'  => null
         ];
 
         $response = $this->post('orders',$data);
