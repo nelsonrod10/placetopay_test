@@ -13,14 +13,16 @@ return [
     |
     */
 
-    'product'         => 'product',
-    'name'   => 'name',
-    'email'  => 'email',
-    'mobile' => 'mobile',
-    'price'     => 'price',
     'currency'  => 'currency',
-    'description'  => 'description',
     'customer_name'   => 'customer name',
     'customer_email'  => 'customer email',
     'customer_mobile' => 'customer mobile',
+    'description'  => 'description',
+    'email'  => 'email',
+    'mobile' => 'mobile',
+    'name'   => 'name',
+    'product'         => 'product',
+    'price'     => 'price',
+    'reference'  => 'reference',
+    'status'     => 'status',
 ];

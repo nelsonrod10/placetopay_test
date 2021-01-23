@@ -13,14 +13,16 @@ return [
     |
     */
 
-    'product'         => 'producto',
-    'name'   => 'nombre',
-    'email'  => 'email',
-    'mobile' => 'número celular',
-    'price'     => 'precio',
     'currency'      => 'moneda',
-    'description'     => 'descripción',
     'customer_name'   => 'nombre del cliente',
     'customer_email'  => 'email del cliente',
     'customer_mobile' => 'número celular del cliente',
+    'description'     => 'descripción',
+    'email'  => 'email',
+    'mobile' => 'número celular',
+    'name'   => 'nombre',
+    'price'     => 'precio',
+    'product'         => 'producto',
+    'reference'  => 'referencia',
+    'status'     => 'estado',
 ];

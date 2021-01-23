@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Products;
+namespace App\Http\Requests\Gateways\PlacetoPlay;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreProductRequest extends FormRequest
+class ShowResultRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +24,8 @@ class StoreProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'        => 'required|string',
-            'price'       => 'required|string',
-            'currency'    => 'required|string|in:COP,USD',
-            'description' => 'required|string'
+            'reference' => 'required|string|exists:orders,number',
+            'status'    => 'required|array'
         ];
     }
 
@@ -39,10 +37,8 @@ class StoreProductRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name'      => __('translations.name'),
-            'price'     => __('translations.price'),
-            'currency'  => __('translations.currency'),
-            'description'  => __('translations.description'),
+            'reference'  => __('translations.reference'),
+            'status'     => __('translations.status'),
         ];
     }
 }

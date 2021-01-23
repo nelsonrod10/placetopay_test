@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Order;
 use Illuminate\Http\Request;
 use Dnetix\Redirection\PlacetoPay;
+use App\Http\Requests\Gateways\PlacetoPlay\ShowResultRequest;
 
 class PlacetoPlayController extends Controller
 {
@@ -90,8 +91,10 @@ class PlacetoPlayController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $data)
+    public function show(ShowResultRequest $request)
     {
+        $data = $request->all();
+
         $reference = $data['reference'];
         $status = $data['status']['status'];
         

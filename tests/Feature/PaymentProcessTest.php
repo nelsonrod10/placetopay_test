@@ -139,18 +139,31 @@ class PaymentProcessTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        factory(Product::class,1)->create();
+        $product = Product::first();
+
+        factory(Order::class)->create([
+            'product_id' => $product->id,
+        ]);
+        
+        $newOrder = $product->getOrder();
+
+        $status = [
+            'status'  => 'PENDING',
+            'reason'  => 'XX',
+            'message' => 'The message of the status',
+            'date'    => '23-01-2021',
+        ];
+
         $response = $this->post('payment-result',
             [
-                'reference' => "dsdfsdfddd",
-                'status'    => "FAKER"
+                'reference' => $newOrder->number,
+                'status'    => $status
             ]
-        );
-
-        $response->assertSessionHasErrors([
+        )->assertSessionHasNoErrors([
             'reference',
             'status',
         ]);
-
         
     }
 
