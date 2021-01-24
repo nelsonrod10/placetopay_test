@@ -98,7 +98,7 @@ class PlacetoPlayController extends Controller
         $reference = $data['reference'];
         $status = $data['status']['status'];
         
-        $order = Order::where('number',$reference)->first();
+        $order = Order::where('number',$reference)->with('gateway')->first();
         return view('payments.show',compact('order','status'));        
     }
 
