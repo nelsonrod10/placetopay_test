@@ -2,10 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\User;
 use App\Order;
-use App\PaymentGateway;
 use App\Product;
 use Tests\TestCase;
+use App\PaymentGateway;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -151,7 +152,21 @@ class OrderProductTest extends TestCase
      */
     public function show_a_orders_index_to_admin()
     {
-        //
+        $user = factory(User::class)->create([
+            'role' => 'Admin'
+        ]);
+
+        $response = $this->actingAs($user,'admin')
+                    ->get(route('orders.index'));
+
+        $response->assertStatus(200);
+
+        factory(Order::class,5)->create();
+        $orders = Order::all();
+        
+        $response->assertViewIs('orders.index');
+
+        $response->assertViewHas(['orders' => $orders]);
     }
 
 }
