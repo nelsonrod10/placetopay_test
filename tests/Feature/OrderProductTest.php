@@ -152,16 +152,26 @@ class OrderProductTest extends TestCase
      */
     public function show_a_orders_index_to_admin()
     {
+        $this->withoutExceptionHandling();
+
         $user = factory(User::class)->create([
             'role' => 'Admin'
         ]);
+
+        factory(Product::class,5)
+        ->create()
+        ->each(function($product){
+            factory(Order::class)
+            ->create([
+                'product_id' => $product->id
+            ]);
+        });    
 
         $response = $this->actingAs($user)
                     ->get('orders-list');
 
         $response->assertStatus(200);
-
-        factory(Order::class,5)->create();
+        
         $orders = Order::all();
         
         $response->assertViewIs('orders.index');

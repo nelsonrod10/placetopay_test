@@ -21,7 +21,9 @@ class OrdersController extends Controller
     {
         $this->authorize('viewAny', Order::class);
 
-        dd("esta autorizado");
+        $orders = Order::all();
+
+        return view('orders.index',compact('orders'));
     }
 
     /**
