@@ -25,9 +25,9 @@
                                         </div>
                                         <div class="flex-1 flex text-center pt-4">
                                             <div class="flex-1 text-2xl font-semibold py-4">$ {{$product->price}} {{$product->currency}}</div>
-                                            <div class="flex-1 cursor-pointer text-white font-semibold bg-green-500 hover:bg-green-800 py-4 mr-2 rounded-md">
-                                                <a href="{{route('create-order',$product)}}">Comprar</a>
-                                            </div>
+                                            <a href="{{route('create-order',$product)}}" class="flex-1 cursor-pointer text-white font-semibold bg-green-500 hover:bg-green-800 py-4 mr-2 rounded-md">
+                                                Comprar
+                                            </a>
                                         </div>
                                     </div>
                                     
