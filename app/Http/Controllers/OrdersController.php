@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Dnetix\Redirection\PlacetoPay;
 use App\Http\Requests\Orders\StoreOrderRequest;
+use App\Http\Requests\Orders\UpdateOrderRequest;
 
 class OrdersController extends Controller
 {
@@ -129,9 +130,9 @@ class OrdersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Order $order)
     {
-        //
+        return view('orders.edit',compact('order'));
     }
 
     /**
@@ -141,9 +142,61 @@ class OrdersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateOrderRequest $request, Order $order)
     {
-        //
+        $data = $request->all();
+        
+        $placetopay = new PlacetoPay([
+            'login'     => env('LOGIN_P2P'),
+            'tranKey'   => env('TRANKEY_P2P'),
+            'url'       => env('BASE_URL_P2P'),
+            'rest'      => [
+                'timeout' => 45,
+                'connect_timeout' => 30,
+            ]
+        ]);
+
+        $request = [
+            'buyer' => [
+                'name'  => $data['customer_name'],
+                'email' => $data['customer_email'],
+                'mobile'=> $data['customer_mobile'],
+            ],
+            'payment' => [
+                'reference'   => $order->number,
+                'description' => $order->product->name.", ".$order->product->description,
+                'amount'      => [
+                    'currency' => $order->product->currency,
+                    'total' => $order->product->price,
+                ],
+            ],
+            'expiration' => date('c', strtotime('+2 days')),
+            'returnUrl' => env('APP_URL').'validate-payment/'.$order->number,
+            'ipAddress' => '127.0.0.1',
+            'userAgent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
+        ];
+        
+        $response = $placetopay->request($request);
+
+        if ($response->isSuccessful()) {
+            $order->update([
+                'customer_name'   => $data['customer_name'], 
+                'customer_email'  => $data['customer_email'], 
+                'customer_mobile' => $data['customer_mobile'],
+            ]);
+                
+            $order->gateway->update([
+                'payment_data'  => json_encode([
+                    'process_url' => $response->processUrl(),
+                    'request_id'  => $response->requestId(),
+                    'status'      => 'PENDING'      
+                ])
+            ]);
+            return redirect()->route('orders.show',$order);        
+
+        } else {
+            return redirect()->back()->with(['errorProcess'=>$response->status()->message()]);
+        }
     }
 
     /**

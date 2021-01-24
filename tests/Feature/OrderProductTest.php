@@ -72,6 +72,74 @@ class OrderProductTest extends TestCase
     }
 
     /**
+     * Edit an order when transaction was rejected.
+     * @test
+     * @return void
+     */
+    public function a_order_can_be_edited()
+    {
+        $this->withoutExceptionHandling();
+
+        factory(Product::class,1)->create();
+
+        $product = Product::first();
+
+        factory(Order::class,1)->create([
+            'product_id'          => $product->id,
+        ]);
+        $order = $product->getOrder();
+
+        $response = $this->get('orders/'.$order->id."/edit");
+
+        $response->assertViewIs(route('orders.edit',$order));
+    }
+
+    /**
+     * Update an order when transaction was rejected.
+     * @test
+     * @return void
+     */
+    public function a_order_can_be_updated()
+    {
+        $this->withoutExceptionHandling();
+
+        $processUrl = "https://www.testapp.com";
+        $requestId  = 8090100;
+
+        factory(Product::class,1)->create();
+
+        $product = Product::first();
+
+        factory(Order::class,1)->create([
+            'product_id'          => $product->id,
+        ])->each(function($order) use($processUrl,$requestId){
+            factory(PaymentGateway::class)->create([
+                'order_id' => $order->id,
+                'enterprise' => 'Place to pay',
+                'payment_data' => json_encode([
+                    'process_url' => $processUrl,
+                    'request_id'  => $requestId,
+                    'status'      => 'PENDING'      
+                ]),
+            ]);
+        });
+
+        
+
+        $order = $product->getOrder();
+
+        $response = $this->put(route('orders.update',$order->id),[
+            'customer_name'   => 'New customer name',
+            'customer_email'  => 'new@email.com',
+            'customer_mobile' => '3112333333',
+        ]);
+
+        $this->assertEquals($product->id,$order->product_id);
+
+        $response->assertRedirect(route('orders.show',$order));
+    }
+
+    /**
      * Validate the validation errors when store an order.
      * @test
      * @return void
