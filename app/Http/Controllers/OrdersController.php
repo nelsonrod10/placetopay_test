@@ -101,7 +101,6 @@ class OrdersController extends Controller
                 ])
             ]);
             return redirect()->route('orders.show',$newOrder);        
-            //return redirect()->away($response->processUrl());
 
         } else {
             return redirect()->back()->with(['errorProcess'=>$response->status()->message()]);
