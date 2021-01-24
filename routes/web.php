@@ -20,7 +20,7 @@ Route::get('/', function () {
 Auth::routes(['register' => false]);
 
 Route::resource('products', 'ProductsController');
-Route::get('create-order/{product}', 'OrdersController@create');
+Route::get('create-order/{product}', 'OrdersController@create')->name('create-order');
 Route::get('orders-list', 'OrdersController@index')->middleware('auth');
 Route::resource('orders', 'OrdersController')->except(['index']);
 Route::get('validate-payment/{reference}', 'PlacetoPlayController@validateStatus');
