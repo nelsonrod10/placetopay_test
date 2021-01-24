@@ -279,7 +279,7 @@ class OrderProductTest extends TestCase
 
         $order = $product->getOrder();
 
-        $response = $this->delete(route('orders.update',$order->id));
+        $response = $this->delete(route('orders.destroy',$order->id));
 
         $this->assertDatabaseMissing('orders',['number'=>$order->number]);
 

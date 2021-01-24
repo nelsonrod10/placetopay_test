@@ -73,6 +73,9 @@
                             <button type="submit" class="w-full bg-green-400 hover:bg-green-600 text-white font-semibold text-2xl py-6 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Confirmar compra
                             </button>
+                            <div class="mt-4"> 
+                                <a class="text-gray-500 underline" href="{{url('/')}}">Cancelar compra</a>
+                            </div>
                         </div>
                     </form>
 
