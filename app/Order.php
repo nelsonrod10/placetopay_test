@@ -16,6 +16,11 @@ class Order extends Model
         'product_id','number','customer_name', 'customer_email', 'customer_mobile', 'status',
     ];
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+    
     public function gateway()
     {
         return $this->hasOne(PaymentGateway::class);

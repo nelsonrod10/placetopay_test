@@ -55,13 +55,11 @@ class PlacetoPlayController extends Controller
             return redirect()->back()->with(['errorMessage' => $response->status()->message()]);
             
         }
-
-        return redirect()->route('payment-result',
-            new Request([
-                'reference' => $reference,
-                'status'    => $arrStatus
-            ])
-        );
+        return $this->show(new ShowResultRequest([
+            'reference' => $reference,
+            'status'    => $arrStatus
+        ]));
+        
     }
 
     /**
@@ -99,7 +97,8 @@ class PlacetoPlayController extends Controller
         $status = $data['status']['status'];
         
         $order = Order::where('number',$reference)->with('gateway')->first();
-        return view('payments.show',compact('order','status'));        
+        $gateway = json_decode($order->gateway->payment_data,true);
+        return view('payments.show',compact('order','status','gateway'));        
     }
 
     /**

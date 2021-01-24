@@ -12,7 +12,7 @@ return [
     | has failed, such as for an invalid token or invalid new password.
     |
     */
-
+    'approved'  => 'Transaction approved',
     'currency'  => 'currency',
     'customer_name'   => 'customer name',
     'customer_email'  => 'customer email',
@@ -21,8 +21,10 @@ return [
     'email'  => 'email',
     'mobile' => 'mobile',
     'name'   => 'name',
+    'pending'  => 'Transaction pending',
     'product'         => 'product',
     'price'     => 'price',
     'reference'  => 'reference',
+    'rejected'  => 'Transaction rejected',
     'status'     => 'status',
 ];

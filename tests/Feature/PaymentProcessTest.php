@@ -41,19 +41,8 @@ class PaymentProcessTest extends TestCase
         
         $redirectResponse = $this->get('validate-payment/'.$newOrder->number);
 
-        $status = [
-            'status'  => 'APPROVED',
-            'reason'  => 'XS',
-            'message' => 'The message of the status',
-            'date'    => '23-01-2021',
-        ];
-            
-        $redirectResponse->assertRedirect(route('payment-result', 
-            new Request([
-                'reference' => $newOrder->number,
-                'status'    => $status
-            ])
-        ));
+        $redirectResponse->assertViewIs('payments.show');
+        
     }
 
     public function get_payment_result($status)
