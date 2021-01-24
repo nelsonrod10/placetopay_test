@@ -205,8 +205,15 @@ class OrdersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Order $order)
     {
-        //
+        if($order->gateway->count() > 0)
+        {
+            $order->gateway->delete();
+        }
+
+        $order->delete();
+
+        return redirect('/');
     }
 }
