@@ -17,7 +17,7 @@ Route::get('/', function () {
     return redirect()->route('products.index');
 });
 
-Auth::routes();
+Auth::routes(['register' => false]);
 
 Route::resource('products', 'ProductsController');
 Route::get('create-order/{product}', 'OrdersController@create');
