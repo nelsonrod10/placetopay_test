@@ -156,8 +156,8 @@ class OrderProductTest extends TestCase
             'role' => 'Admin'
         ]);
 
-        $response = $this->actingAs($user,'admin')
-                    ->get(route('orders.index'));
+        $response = $this->actingAs($user)
+                    ->get('orders-list');
 
         $response->assertStatus(200);
 

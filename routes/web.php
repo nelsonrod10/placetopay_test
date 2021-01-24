@@ -20,7 +20,8 @@ Auth::routes();
 
 Route::resource('products', 'ProductsController');
 Route::get('create-order/{product}', 'OrdersController@create');
-Route::resource('orders', 'OrdersController');
+Route::get('orders-list', 'OrdersController@index')->middleware('auth');
+Route::resource('orders', 'OrdersController')->except(['index']);
 Route::get('validate-payment/{reference}', 'PlacetoPlayController@validateStatus');
 Route::post('payment-result', 'PlacetoPlayController@show')->name('payment-result');
 

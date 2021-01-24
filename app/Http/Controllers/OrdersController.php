@@ -19,7 +19,9 @@ class OrdersController extends Controller
      */
     public function index()
     {
-        //
+        $this->authorize('viewAny', Order::class);
+
+        dd("esta autorizado");
     }
 
     /**
