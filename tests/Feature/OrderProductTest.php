@@ -68,7 +68,7 @@ class OrderProductTest extends TestCase
 
         $this->assertEquals($product->id,$newOrder->product_id);
 
-        $response->assertRedirect($dataGateway['process_url']);
+        $response->assertRedirect(route('orders.show',$newOrder));
     }
 
     /**
