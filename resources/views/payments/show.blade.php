@@ -1,18 +1,48 @@
 @extends('layouts.app')
+<?php
 
+    $status = 'REJECTED';
+    
+    switch ($status) {
+        case 'REJECTED':
+            $btnText = "Intertar nuevamente";
+            $bgColor = "bg-red-500";
+            $textColor = "text-red-500 ";
+            $url = route('orders.edit',$order);
+            break;
+        case 'PENDING':
+            $btnText = "Realizar pago";
+            $bgColor = "bg-yellow-300";
+            $textColor = "text-yellow-500 ";
+            $url = url($gateway['process_url']);
+            break;
+        default:
+            $btnText = "Finalizar";
+            $bgColor = "bg-green-500";
+            $textColor = "text-green-600 ";
+            $url = url('/');
+            break;
+    }
+?>
 @section('content')
-    <div class="flex items-center">
-        <div class="w-full px-2 md:mx-auto">
-            <div class="flex flex-col break-words bg-white border-2 rounded shadow-md">
 
-                <div class="font-semibold bg-gray-200 text-gray-700 py-3 px-6 mb-0">
-                    resultado de una transacción
-                </div>
-
-                <div class="w-full p-6">
-                    <p class="text-gray-700">
-                        resultado de una transacción
-                    </p>
+    <div class="container mx-auto">
+        <div class="flex flex-wrap justify-center">
+            <div class="w-full md:w-2/4 px-2 py-4">
+                <div class="flex flex-col break-words bg-white border-2 rounded shadow-md">
+                    <div class="text-gray-600 h-10 text-center mx-5 pt-5 pb-36">
+                        <div class="h-3 w-full mb-6 {{$bgColor}}"></div>
+                        <div class="text-xl">
+                            {{__('translations.'.strtolower($status))}}
+                        </div>
+                        <div class="md:mt-10 mt-6">
+                            <a href="{{$url}}" class="bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded focus:outline-none focus:shadow-outline
+                            {{$textColor}}
+                            ">
+                                {{$btnText}}
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
