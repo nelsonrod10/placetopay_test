@@ -104,4 +104,22 @@ class ProductTest extends TestCase
         $response->assertViewHas('product',$product);
 
     }
+
+    /**
+     * Show all products in a homepage.
+     * @test
+     * @return void
+     */
+    public function when_visit_home_redirect_to_index_products()
+    {
+        $this->withoutExceptionHandling();
+
+        factory(Product::class,10)->create();
+
+        $response = $this->get('/');
+        
+        $response->assertStatus(302);
+
+        $response->assertRedirect('products');
+    }
 }
