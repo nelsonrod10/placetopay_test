@@ -55,13 +55,11 @@ class PlacetoPlayController extends Controller
             return redirect()->back()->with(['errorMessage' => $response->status()->message()]);
             
         }
-
-        return redirect()->action('PlacetoPlayController@show',
-            new Request([
-                'reference' => $reference,
-                'status'    => $arrStatus
-            ])
-        );
+        return $this->show(new ShowResultRequest([
+            'reference' => $reference,
+            'status'    => $arrStatus
+        ]));
+        
     }
 
     /**
