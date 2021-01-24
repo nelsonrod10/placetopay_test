@@ -56,7 +56,7 @@ class PlacetoPlayController extends Controller
             
         }
 
-        return redirect()->route('payment-result',
+        return redirect()->action('PlacetoPlayController@show',
             new Request([
                 'reference' => $reference,
                 'status'    => $arrStatus
