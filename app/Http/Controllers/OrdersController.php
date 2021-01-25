@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Dnetix\Redirection\PlacetoPay;
 use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
+use App\Repositories\PaymentGatewayRepository;
 use App\Http\Requests\Orders\StoreOrderRequest;
 use App\Http\Requests\Orders\UpdateOrderRequest;
 
@@ -17,11 +18,13 @@ class OrdersController extends Controller
 {
     private $orderRepository;
     private $productRepository;
+    private $paymentRepository;
 
-    public function __construct(OrderRepository $orderRepository, ProductRepository $productRepository)
+    public function __construct(OrderRepository $orderRepository, ProductRepository $productRepository, PaymentGatewayRepository $paymentGatewayRepository)
     {
         $this->orderRepository = $orderRepository;
         $this->productRepository = $productRepository;
+        $this->paymentRepository = $paymentGatewayRepository;
     }
     /**
      * Display a listing of the resource.
@@ -104,15 +107,18 @@ class OrdersController extends Controller
                                 'customer_mobile' => $data['customer_mobile'],
                         ]));
 
-            PaymentGateway::create([
-                'order_id'      => $newOrder->id,
-                'enterprise'    => 'PlaceToPay',
-                'payment_data'  => json_encode([
-                    'process_url' => $response->processUrl(),
-                    'request_id'  => $response->requestId(),
-                    'status'      => 'PENDING'      
+            $this->paymentRepository->save(
+                new PaymentGateway([
+                    'order_id'      => $newOrder->id,
+                    'enterprise'    => 'PlaceToPay',
+                    'payment_data'  => json_encode([
+                        'process_url' => $response->processUrl(),
+                        'request_id'  => $response->requestId(),
+                        'status'      => 'PENDING'      
+                    ])
                 ])
-            ]);
+            );                        
+            
             return redirect()->route('orders.show',$newOrder);        
 
         } else {
@@ -199,13 +205,16 @@ class OrdersController extends Controller
 
             $updateOrder = $this->orderRepository->save($order);
                 
-            $updateOrder->gateway->update([
+            $paymentGateway = $updateOrder->gateway->fill([
                 'payment_data'  => json_encode([
                     'process_url' => $response->processUrl(),
                     'request_id'  => $response->requestId(),
                     'status'      => 'PENDING'      
                 ])
             ]);
+
+            $this->paymentRepository->save($paymentGateway);
+            
             return redirect()->route('orders.show',$updateOrder);        
 
         } else {
