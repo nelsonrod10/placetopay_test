@@ -8,11 +8,21 @@ use App\PaymentGateway;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Dnetix\Redirection\PlacetoPay;
+use App\Repositories\OrderRepository;
+use App\Repositories\ProductRepository;
 use App\Http\Requests\Orders\StoreOrderRequest;
 use App\Http\Requests\Orders\UpdateOrderRequest;
 
 class OrdersController extends Controller
 {
+    private $orderRepository;
+    private $productRepository;
+
+    public function __construct(OrderRepository $orderRepository, ProductRepository $productRepository)
+    {
+        $this->orderRepository = $orderRepository;
+        $this->productRepository = $productRepository;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -22,7 +32,7 @@ class OrdersController extends Controller
     {
         $this->authorize('viewAny', Order::class);
 
-        $orders = Order::all();
+        $orders = $this->orderRepository->all();
 
         return view('orders.index',compact('orders'));
     }
@@ -49,7 +59,7 @@ class OrdersController extends Controller
 
         $orderNumber = str_shuffle(Str::random(5).date('s').mt_rand (100,1000));
         
-        $product = Product::find($data['product_id']);
+        $product =  $this->productRepository->get($data['product_id']);
 
         $placetopay = new PlacetoPay([
             'login'     => env('LOGIN_P2P'),
@@ -84,13 +94,15 @@ class OrdersController extends Controller
         $response = $placetopay->request($request);
 
         if ($response->isSuccessful()) {
-            $newOrder = Order::create([
-                'product_id'      => $data['product_id'],
-                'number'          => $orderNumber,
-                'customer_name'   => $data['customer_name'], 
-                'customer_email'  => $data['customer_email'], 
-                'customer_mobile' => $data['customer_mobile'],
-            ]);
+
+            $newOrder = $this->orderRepository->save(
+                            new Order([
+                                'product_id'      => $data['product_id'],
+                                'number'          => $orderNumber,
+                                'customer_name'   => $data['customer_name'], 
+                                'customer_email'  => $data['customer_email'], 
+                                'customer_mobile' => $data['customer_mobile'],
+                        ]));
 
             PaymentGateway::create([
                 'order_id'      => $newOrder->id,
@@ -179,20 +191,22 @@ class OrdersController extends Controller
         $response = $placetopay->request($request);
 
         if ($response->isSuccessful()) {
-            $order->update([
+            $order->fill([
                 'customer_name'   => $data['customer_name'], 
                 'customer_email'  => $data['customer_email'], 
                 'customer_mobile' => $data['customer_mobile'],
             ]);
+
+            $updateOrder = $this->orderRepository->save($order);
                 
-            $order->gateway->update([
+            $updateOrder->gateway->update([
                 'payment_data'  => json_encode([
                     'process_url' => $response->processUrl(),
                     'request_id'  => $response->requestId(),
                     'status'      => 'PENDING'      
                 ])
             ]);
-            return redirect()->route('orders.show',$order);        
+            return redirect()->route('orders.show',$updateOrder);        
 
         } else {
             return redirect()->back()->with(['errorProcess'=>$response->status()->message()]);
@@ -207,12 +221,7 @@ class OrdersController extends Controller
      */
     public function destroy(Order $order)
     {
-        if($order->gateway->count() > 0)
-        {
-            $order->gateway->delete();
-        }
-
-        $order->delete();
+        $this->orderRepository->delete($order);
 
         return redirect('/');
     }
