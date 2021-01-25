@@ -19,9 +19,13 @@
                 </div>
                 <div class="w-full p-6">
                     @foreach ($orders as $order)
-                        <?php
-                            $gateway = json_decode($order->gateway->payment_data,true)
-                        ?>
+                    <?php
+                        $status = "null";
+                        if ($order->gateway) {
+                            $gateway = json_decode($order->gateway->payment_data,true);
+                            $status = $gateway['status'];
+                        }
+                    ?>
                     <div class="flex flex-col md:flex-row md:text-center content-center border-gray-400 border-b-2 py-4 ">
                         <div class="flex-1 "><p>{{$order->number}}</p></div>
                         <div class="flex-1"><p>{{$order->product->name}}</p></div>
@@ -33,7 +37,7 @@
                             <p class="pb-2">{{$order->customer_email}}</p>
                             <p>{{$order->customer_mobile}}</p>
                         </div>
-                        <div class="flex-1"><p>{{$gateway['status']}}</p></div>
+                        <div class="flex-1"><p>{{$status}}</p></div>
                     </div>    
                     @endforeach
                 </div>
