@@ -23,6 +23,11 @@ class OrderRepository
         return $this->model->find($id);
     }
 
+    public function getWhere($field, $value)
+    {
+        return $this->model->where($field,$value)->with(['gateway'])->first();
+    }
+
     public function save(Order $order)
     {
         $order->save();
