@@ -18,7 +18,6 @@ class CreatePaymentGatewaysTable extends Migration
             $table->unsignedBigInteger('order_id');
             $table->string('enterprise');
             $table->text('payment_data');
-            $table->foreign('order_id')->references('id')->on('orders');
             $table->timestamps();
         });
     }

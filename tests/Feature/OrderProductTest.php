@@ -85,13 +85,13 @@ class OrderProductTest extends TestCase
         $product = Product::first();
 
         factory(Order::class,1)->create([
-            'product_id'          => $product->id,
+            'product_id' => $product->id,
         ]);
         $order = $product->getOrder();
 
         $response = $this->get('orders/'.$order->id."/edit");
 
-        $response->assertViewIs(route('orders.edit',$order));
+        $response->assertViewIs('orders.edit',$order);
     }
 
     /**
@@ -233,6 +233,16 @@ class OrderProductTest extends TestCase
             ->create([
                 'product_id' => $product->id
             ]);
+        })->each(function($order){
+            factory(PaymentGateway::class)->create([
+                'order_id' => $order->id,
+                'enterprise' => 'Place to pay',
+                'payment_data' => json_encode([
+                    'process_url' => "https://www.testapp.com",
+                    'request_id'  => rand(1500,2500),
+                    'status'      => 'PENDING'      
+                ]),
+            ]);
         });    
 
         $response = $this->actingAs($user)
@@ -244,7 +254,6 @@ class OrderProductTest extends TestCase
         
         $response->assertViewIs('orders.index');
 
-        $response->assertViewHas(['orders' => $orders]);
     }
 
     /**

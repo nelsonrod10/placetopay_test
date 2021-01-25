@@ -5,10 +5,17 @@ namespace App\Http\Controllers;
 use App\Order;
 use Illuminate\Http\Request;
 use Dnetix\Redirection\PlacetoPay;
+use App\Repositories\OrderRepository;
 use App\Http\Requests\Gateways\PlacetoPlay\ShowResultRequest;
 
 class PlacetoPlayController extends Controller
 {
+    private $orderRepository;
+
+    public function __construct(OrderRepository $orderRepository)
+    {
+        $this->orderRepository = $orderRepository;
+    }
     /**
      * Validate the status of payment reference
      *
@@ -16,7 +23,7 @@ class PlacetoPlayController extends Controller
      */
     public function validateStatus($reference)
     {
-        $order = Order::where('number',$reference)->first();
+        $order = $this->orderRepository->getWhere('number',$reference);
         $arrStatus = null;
 
         $gateway = $order->gateway()->first();
@@ -44,10 +51,13 @@ class PlacetoPlayController extends Controller
             ]);
             
             if ($response->status()->isApproved()) {
-                
-                $order->update([
+
+                $order->fill([
                     'status' => 'PAYED'
                 ]);
+
+                $this->orderRepository->save($order);
+                
             }
 
         } else {
@@ -95,9 +105,10 @@ class PlacetoPlayController extends Controller
 
         $reference = $data['reference'];
         $status = $data['status']['status'];
-        
-        $order = Order::where('number',$reference)->with('gateway')->first();
+
+        $order = $this->orderRepository->getWhere('number',$reference);
         $gateway = json_decode($order->gateway->payment_data,true);
+        
         return view('payments.show',compact('order','status','gateway'));        
     }
 

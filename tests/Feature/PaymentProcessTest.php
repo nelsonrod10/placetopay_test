@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Order;
 use App\Product;
 use Tests\TestCase;
+use App\PaymentGateway;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,7 +53,17 @@ class PaymentProcessTest extends TestCase
 
         factory(Order::class)->create([
             'product_id' => $product->id,
-        ]);
+        ])->each(function($order){
+            factory(PaymentGateway::class)->create([
+                'order_id' => $order->id,
+                'enterprise' => 'Place to pay',
+                'payment_data' => json_encode([
+                    'process_url' => "https://www.testapp.com",
+                    'request_id'  => rand(1500,2500),
+                    'status'      => 'PENDING'      
+                ]),
+            ]);
+        });
         
         $newOrder = $product->getOrder();
 
@@ -133,7 +144,17 @@ class PaymentProcessTest extends TestCase
 
         factory(Order::class)->create([
             'product_id' => $product->id,
-        ]);
+        ])->each(function($order){
+            factory(PaymentGateway::class)->create([
+                'order_id' => $order->id,
+                'enterprise' => 'Place to pay',
+                'payment_data' => json_encode([
+                    'process_url' => "https://www.testapp.com",
+                    'request_id'  => rand(1500,2500),
+                    'status'      => 'PENDING'      
+                ]),
+            ]);
+        });
         
         $newOrder = $product->getOrder();
 
