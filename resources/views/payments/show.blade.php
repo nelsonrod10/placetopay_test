@@ -36,7 +36,7 @@
                         <div class="text-xl">
                             {{__('translations.'.strtolower($status))}}
                         </div>
-                        <div class="md:mt-10 mt-6">
+                        <div class="md:mt-10 mt-6 mb-4">
                             <a href="{{$url}}" class="bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded focus:outline-none focus:shadow-outline
                             {{$textColor}}
                             ">
@@ -44,7 +44,9 @@
                             </a>
                         </div>
                         @if($cancelOrder)
-                            @include('orders.delete')
+                            <div class="my-6">
+                                @include('orders.delete')
+                            <div class="px-6 mb-4">    
                         @endif
                     </div>
                 </div>

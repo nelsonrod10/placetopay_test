@@ -1,4 +1,4 @@
-<div class="mt-4"> 
+<div> 
     <form action="{{route('orders.destroy',$order)}}" method="POST">
         @csrf
         @method('DELETE')

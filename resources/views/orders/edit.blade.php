@@ -72,9 +72,12 @@
                             <button type="submit" class="w-full bg-green-400 hover:bg-green-600 text-white font-semibold text-2xl py-6 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Confirmar compra
                             </button>
-                            @include('orders.delete')
+                            
                         </div>
                     </form>
+                    <div class="px-6 mb-4">
+                        @include('orders.delete')
+                    </div>
 
                 </div>
             </div>

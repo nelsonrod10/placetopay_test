@@ -50,7 +50,10 @@
                             <a href="{{url($payment['process_url'])}}" class="w-full bg-green-400 hover:bg-green-600 text-white font-semibold text-2xl py-6 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Proceder al pago
                             </a>
-                            @include('orders.delete')
+                            <div class="my-4">
+                                @include('orders.delete')
+                            </div>
+                            
                         </div>
                     </div>    
                     
