@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Order;
 use App\Product;
 use App\PaymentGateway;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Dnetix\Redirection\PlacetoPay;
+use App\Adapters\PlacetoPayAdapter;
 use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\PaymentGatewayRepository;
@@ -19,12 +20,18 @@ class OrdersController extends Controller
     private $orderRepository;
     private $productRepository;
     private $paymentRepository;
+    private $placetoPayAdapter;
 
-    public function __construct(OrderRepository $orderRepository, ProductRepository $productRepository, PaymentGatewayRepository $paymentGatewayRepository)
+    public function __construct(OrderRepository $orderRepository, 
+            ProductRepository $productRepository, 
+            PaymentGatewayRepository $paymentGatewayRepository,
+            PlacetoPayAdapter $placetoPayAdapter
+        )
     {
         $this->orderRepository = $orderRepository;
         $this->productRepository = $productRepository;
         $this->paymentRepository = $paymentGatewayRepository;
+        $this->placetoPayAdapter = $placetoPayAdapter;
     }
     /**
      * Display a listing of the resource.
@@ -50,6 +57,17 @@ class OrdersController extends Controller
         return view('orders.create',compact('product'));
     }
 
+    private function makePaymentRequest($data, Product $product)
+    {
+        $buyerData = [
+            'name'   => $data['customer_name'], 
+            'email'  => $data['customer_email'], 
+            'mobile' => $data['customer_mobile'],
+        ];
+
+        $this->placetoPayAdapter->makeRequest($buyerData,$product);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -59,49 +77,17 @@ class OrdersController extends Controller
     public function store(StoreOrderRequest $request)
     {
         $data = $request->all();
-
-        $orderNumber = str_shuffle(Str::random(5).date('s').mt_rand (100,1000));
         
         $product =  $this->productRepository->get($data['product_id']);
 
-        $placetopay = new PlacetoPay([
-            'login'     => env('LOGIN_P2P'),
-            'tranKey'   => env('TRANKEY_P2P'),
-            'url'       => env('BASE_URL_P2P'),
-            'rest'      => [
-                'timeout' => 45,
-                'connect_timeout' => 30,
-            ]
-        ]);
-
-        $request = [
-            'buyer' => [
-                'name'  => $data['customer_name'],
-                'email' => $data['customer_email'],
-                'mobile'=> $data['customer_mobile'],
-            ],
-            'payment' => [
-                'reference'   => $orderNumber,
-                'description' => $product->name.", ".$product->description,
-                'amount'      => [
-                    'currency' => $product->currency,
-                    'total' => $product->price,
-                ],
-            ],
-            'expiration' => date('c', strtotime('+2 days')),
-            'returnUrl' => env('APP_URL').'validate-payment/'.$orderNumber,
-            'ipAddress' => '127.0.0.1',
-            'userAgent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
-        ];
+        $this->makePaymentRequest($data,$product);
         
-        $response = $placetopay->request($request);
-
-        if ($response->isSuccessful()) {
+        if ($this->placetoPayAdapter->isSuccessful()) {
 
             $newOrder = $this->orderRepository->save(
                             new Order([
                                 'product_id'      => $data['product_id'],
-                                'number'          => $orderNumber,
+                                'number'          => $this->placetoPayAdapter->getOrderNumber(),
                                 'customer_name'   => $data['customer_name'], 
                                 'customer_email'  => $data['customer_email'], 
                                 'customer_mobile' => $data['customer_mobile'],
@@ -112,8 +98,8 @@ class OrdersController extends Controller
                     'order_id'      => $newOrder->id,
                     'enterprise'    => 'PlaceToPay',
                     'payment_data'  => json_encode([
-                        'process_url' => $response->processUrl(),
-                        'request_id'  => $response->requestId(),
+                        'process_url' => $this->placetoPayAdapter->getProcessUrl(),
+                        'request_id'  => $this->placetoPayAdapter->getRequestId(),
                         'status'      => 'PENDING'      
                     ])
                 ])
@@ -122,7 +108,7 @@ class OrdersController extends Controller
             return redirect()->route('orders.show',$newOrder);        
 
         } else {
-            return redirect()->back()->with(['errorProcess'=>$response->status()->message()]);
+            return redirect()->back()->with(['errorProcess'=>$this->placetoPayAdapter->getStatus()->message()]);
         }
         
     }
@@ -163,40 +149,10 @@ class OrdersController extends Controller
     public function update(UpdateOrderRequest $request, Order $order)
     {
         $data = $request->all();
-        
-        $placetopay = new PlacetoPay([
-            'login'     => env('LOGIN_P2P'),
-            'tranKey'   => env('TRANKEY_P2P'),
-            'url'       => env('BASE_URL_P2P'),
-            'rest'      => [
-                'timeout' => 45,
-                'connect_timeout' => 30,
-            ]
-        ]);
 
-        $request = [
-            'buyer' => [
-                'name'  => $data['customer_name'],
-                'email' => $data['customer_email'],
-                'mobile'=> $data['customer_mobile'],
-            ],
-            'payment' => [
-                'reference'   => $order->number,
-                'description' => $order->product->name.", ".$order->product->description,
-                'amount'      => [
-                    'currency' => $order->product->currency,
-                    'total' => $order->product->price,
-                ],
-            ],
-            'expiration' => date('c', strtotime('+2 days')),
-            'returnUrl' => env('APP_URL').'validate-payment/'.$order->number,
-            'ipAddress' => '127.0.0.1',
-            'userAgent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
-        ];
-        
-        $response = $placetopay->request($request);
+        $this->makePaymentRequest($data,$order->product);
 
-        if ($response->isSuccessful()) {
+        if ($this->placetoPayAdapter->isSuccessful()) {
             $order->fill([
                 'customer_name'   => $data['customer_name'], 
                 'customer_email'  => $data['customer_email'], 
@@ -207,8 +163,8 @@ class OrdersController extends Controller
                 
             $paymentGateway = $updateOrder->gateway->fill([
                 'payment_data'  => json_encode([
-                    'process_url' => $response->processUrl(),
-                    'request_id'  => $response->requestId(),
+                    'process_url' => $this->placetoPayAdapter->getProcessUrl(),
+                    'request_id'  => $this->placetoPayAdapter->getRequestId(),
                     'status'      => 'PENDING'      
                 ])
             ]);
@@ -218,7 +174,7 @@ class OrdersController extends Controller
             return redirect()->route('orders.show',$updateOrder);        
 
         } else {
-            return redirect()->back()->with(['errorProcess'=>$response->status()->message()]);
+            return redirect()->back()->with(['errorProcess'=>$this->placetoPayAdapter->getStatus()->message()]);
         }
     }
 
