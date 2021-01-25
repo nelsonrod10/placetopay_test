@@ -5,16 +5,19 @@ namespace App\Http\Controllers;
 use App\Order;
 use Illuminate\Http\Request;
 use Dnetix\Redirection\PlacetoPay;
+use App\Adapters\PlacetoPayAdapter;
 use App\Repositories\OrderRepository;
 use App\Http\Requests\Gateways\PlacetoPlay\ShowResultRequest;
 
 class PlacetoPlayController extends Controller
 {
     private $orderRepository;
+    private $placetoPayAdapter;
 
-    public function __construct(OrderRepository $orderRepository)
+    public function __construct(OrderRepository $orderRepository, PlacetoPayAdapter $placetoPayAdapter)
     {
         $this->orderRepository = $orderRepository;
+        $this->placetoPayAdapter = $placetoPayAdapter;
     }
     /**
      * Validate the status of payment reference
@@ -26,23 +29,18 @@ class PlacetoPlayController extends Controller
         $order = $this->orderRepository->getWhere('number',$reference);
         $arrStatus = null;
 
+        if(!$order)
+        {
+            return "tenemos un problema para procesar su solicitud";
+        }
+
         $gateway = $order->gateway()->first();
         $dataGateway =  json_decode($gateway->payment_data,true);
 
-        $placetopay = new PlacetoPay([
-            'login'     => env('LOGIN_P2P'),
-            'tranKey'   => env('TRANKEY_P2P'),
-            'url'       => env('BASE_URL_P2P'),
-            'rest'      => [
-                'timeout' => 45,
-                'connect_timeout' => 30,
-            ]
-        ]);
-
-        $response = $placetopay->query($dataGateway['request_id']);
-
-        if ($response->isSuccessful()) {
-            $arrStatus = $response->status()->toArray();
+        $this->placetoPayAdapter->paymentResult($dataGateway['request_id']);
+        
+        if ($this->placetoPayAdapter->isSuccessful()) {
+            $arrStatus = $this->placetoPayAdapter->getStatus()->toArray();
             
             $dataGateway['status'] = $arrStatus['status'];
 
@@ -50,7 +48,7 @@ class PlacetoPlayController extends Controller
                 'payment_data'  => json_encode($dataGateway)
             ]);
             
-            if ($response->status()->isApproved()) {
+            if ($this->placetoPayAdapter->getStatus()->isApproved()) {
 
                 $order->fill([
                     'status' => 'PAYED'
@@ -62,7 +60,7 @@ class PlacetoPlayController extends Controller
 
         } else {
             
-            return redirect()->back()->with(['errorMessage' => $response->status()->message()]);
+            return redirect()->back()->with(['errorMessage' => $this->placetoPayAdapter->getStatus()->message()]);
             
         }
         return $this->show(new ShowResultRequest([
